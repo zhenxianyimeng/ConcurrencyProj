@@ -47,8 +47,8 @@ public class Storage {
 
                 // 生产产品
                 count.incrementAndGet();
-                list.add(count.intValue());
-//                list.add(Math.abs(random.nextInt()));
+//                list.add(count.intValue());
+                list.add(Math.abs(random.nextInt()));
                 System.out.println("【producer】：生产了一个产品\t【现仓储量为】:" + list.size());
 
                 list.notifyAll();

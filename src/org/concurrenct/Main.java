@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
         LinkedList<Integer> linkedList = new LinkedList<>();
         int m = 4;
-        int n = 16;
+        int n = 400;
         int k = 3;
         Storage storage = new Storage(n, m, linkedList);
         Producer producer = new Producer();
