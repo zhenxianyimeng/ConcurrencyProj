@@ -14,7 +14,7 @@ public class Main {
         LinkedList<Integer> linkedList = new LinkedList<>();
         int m = 4;
         int n = 16;
-        int k = 2;
+        int k = 3;
         Storage storage = new Storage(n, m, linkedList);
         Producer producer = new Producer();
         producer.setStorage(storage);

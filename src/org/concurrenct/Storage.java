@@ -65,6 +65,9 @@ public class Storage {
                 synchronized (list) {
                     //如果仓库存储量不足
                     while (list.size() == 0) {
+                        if(count.intValue() >= n && isAllnotEven()){
+                            break;
+                        }
                         System.out.println("仓库已空，【consumerEven】： 暂时不能执行消费任务!");
                         try {
                             // 由于条件不满足，消费阻塞
@@ -73,11 +76,11 @@ public class Storage {
                             e.printStackTrace();
                         }
                     }
-                    for (int i=0; i<list.size(); i++){
-                        if(list.get(i)%2==0){
+                    for (int i = 0; i < list.size(); i++) {
+                        if (list.get(i) % 2 == 0) {
                             System.out.println("【consumerEven】：消费了一个产品\t【现仓储量为】:" + list.size());
                             System.out.println("*********************Even+:" + list.get(i));
-                            fw.write(list.get(i).toString()+"\n");
+                            fw.write(list.get(i).toString() + "\n");
                             list.remove(i);
                         }
                     }
@@ -86,11 +89,11 @@ public class Storage {
                 }
             }
             fw.flush();
-        }catch (Exception e){
+        } catch (Exception e) {
 
-        }finally {
+        } finally {
             try {
-                if(fw != null) {
+                if (fw != null) {
                     fw.close();
                 }
             } catch (IOException e) {
@@ -109,6 +112,9 @@ public class Storage {
                 synchronized (list) {
                     //如果仓库存储量不足
                     while (list.size() == 0) {
+                        if(count.intValue() >= n && isAllnotOdd()){
+                            break;
+                        }
                         System.out.println("仓库已空，【consumerOdd】： 暂时不能执行消费任务!");
                         try {
                             // 由于条件不满足，消费阻塞
@@ -122,7 +128,7 @@ public class Storage {
                         if (list.get(i) % 2 == 1) {
                             System.out.println("【consumerOdd】：消费了一个产品\t【现仓储量为】:" + list.size());
                             System.out.println("*********************Odd+:" + list.get(i));
-                            fw.write(list.get(i).toString()+"\n");
+                            fw.write(list.get(i).toString() + "\n");
                             list.remove(i);
                         }
                     }
@@ -130,11 +136,11 @@ public class Storage {
                 }
             }
             fw.flush();
-        }catch (Exception e){
+        } catch (Exception e) {
 
-        }finally {
+        } finally {
             try {
-                if(fw != null) {
+                if (fw != null) {
                     fw.close();
                 }
             } catch (IOException e) {
@@ -147,12 +153,14 @@ public class Storage {
     public void consumeNum(int methodNum) {
         FileWriter fw = null;
         try {
-            fw = new FileWriter("div"+methodNum+"-numbers.txt");
+            fw = new FileWriter("div" + methodNum + "-numbers.txt");
             while (!(count.intValue() >= n && isAllnotNumberDiv(methodNum))) {
-
                 synchronized (list) {
                     //如果仓库存储量不足
                     while (list.size() == 0) {
+                        if(count.intValue() >= n && isAllnotNumberDiv(methodNum)){
+                            break;
+                        }
                         System.out.println("仓库已空，【consumeNum】" + methodNum + "： 暂时不能执行消费任务!");
                         try {
                             // 由于条件不满足，消费阻塞
@@ -166,7 +174,7 @@ public class Storage {
                         if (list.get(i) % methodNum == 0) {
                             System.out.println("【consumeNum】" + methodNum + "：消费了一个产品\t【现仓储量为】:" + list.size());
                             System.out.println("*********************" + methodNum + ":" + list.get(i));
-                            fw.write(list.get(i).toString()+"\n");
+                            fw.write(list.get(i).toString() + "\n");
                             list.remove(i);
                         }
                     }
@@ -174,9 +182,9 @@ public class Storage {
                 }
             }
             fw.flush();
-        }catch (Exception e){
+        } catch (Exception e) {
             try {
-                if(fw != null) {
+                if (fw != null) {
                     fw.close();
                 }
             } catch (IOException e1) {
@@ -185,32 +193,47 @@ public class Storage {
         }
     }
 
-    private boolean isAllnotEven(){
-        for (int i=0; i<list.size(); i++){
-            if(list.get(i)%2==0){
-                return false;
+    private boolean isAllnotEven() {
+        synchronized (list) {
+            if (list.size() == 0) {
+                return true;
             }
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) % 2 == 0) {
+                    return false;
+                }
+            }
+            return true;
         }
-        return true;
     }
 
-    private boolean isAllnotOdd(){
-        for (int i=0; i<list.size(); i++){
-            if(list.get(i)%2==1){
-                return false;
+    private boolean isAllnotOdd() {
+        synchronized (list) {
+            if (list.size() == 0) {
+                return true;
             }
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) % 2 == 1) {
+                    return false;
+                }
+            }
+            return true;
         }
-        return true;
     }
 
-    private boolean isAllnotNumberDiv(int methodNum){
-
-        for (int i=0; i<list.size(); i++){
-            if(list.get(i)%methodNum==0){
-                return false;
+    private boolean isAllnotNumberDiv(int methodNum) {
+        synchronized (list) {
+            if (list.size() == 0) {
+                return true;
             }
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) % methodNum == 0) {
+                    return false;
+                }
+            }
+
+            return true;
         }
-        return true;
     }
 
     public int getN() {
