@@ -14,17 +14,12 @@ public class Main {
         LinkedList<Integer> linkedList = new LinkedList<>();
         int m = 4;
         int n = 16;
-        int k = 3;
+        int k = 2;
         Storage storage = new Storage(n, m, linkedList);
         Producer producer = new Producer();
         producer.setStorage(storage);
         producer.start();
 
-
-//        Consumer consumer = new Consumer();
-//        consumer.setMethodNum(1);
-//        consumer.setStorage(storage);
-//        consumer.start();
         List<Consumer> consumerList = new ArrayList<>(k);
         for(int i=1; i<=k; i++){
             Consumer consumer = new Consumer();

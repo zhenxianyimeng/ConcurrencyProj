@@ -1,5 +1,7 @@
 package org.concurrenct;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Stack;
@@ -14,7 +16,7 @@ public class Storage {
 
     private int m;
 
-    private int count;
+    private AtomicInteger count;
 
     private LinkedList<Integer> list = new LinkedList<>();
 
@@ -25,11 +27,11 @@ public class Storage {
         this.n = n;
         this.m = m;
         this.list = list;
-        count = 0;
+        count = new AtomicInteger(0);
     }
 
     public void produce() {
-        while (count < n) {
+        while (count.intValue() < n) {
             Random random = new Random();
             synchronized (list) {
                 // 如果仓库已满
@@ -44,7 +46,8 @@ public class Storage {
                 }
 
                 // 生产产品
-                list.add(++count);
+                count.incrementAndGet();
+                list.add(count.intValue());
 //                list.add(Math.abs(random.nextInt()));
                 System.out.println("【producer】：生产了一个产品\t【现仓储量为】:" + list.size());
 
@@ -55,90 +58,130 @@ public class Storage {
 
     // 消费产品
     public void consumeEven() {
-        while (!(count >= n && isAllnotEven())) {
-            synchronized (list) {
-                //如果仓库存储量不足
-                while (list.size() == 0) {
-                    System.out.println("仓库已空，【consumerEven】： 暂时不能执行消费任务!");
-                    try {
-                        // 由于条件不满足，消费阻塞
-                        list.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter("even-numbers.txt");
+            while (!(count.intValue() >= n && isAllnotEven())) {
+                synchronized (list) {
+                    //如果仓库存储量不足
+                    while (list.size() == 0) {
+                        System.out.println("仓库已空，【consumerEven】： 暂时不能执行消费任务!");
+                        try {
+                            // 由于条件不满足，消费阻塞
+                            list.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-                for (int i=0; i<list.size(); i++){
-                    if(list.get(i)%2==0){
-                        System.out.println("【consumerEven】：消费了一个产品\t【现仓储量为】:" + list.size());
-                        System.out.println("*********************Even+:" + list.get(i));
-                        list.remove(i);
+                    for (int i=0; i<list.size(); i++){
+                        if(list.get(i)%2==0){
+                            System.out.println("【consumerEven】：消费了一个产品\t【现仓储量为】:" + list.size());
+                            System.out.println("*********************Even+:" + list.get(i));
+                            fw.write(list.get(i).toString()+"\n");
+                            list.remove(i);
+                        }
                     }
+
+                    list.notifyAll();
                 }
-//                int num = list.peek();
-//                System.out.println("【consumerEven】：消费了一个产品\t【现仓储量为】:" + list.size());
-//                if (num % 2 == 0) {
-//                    System.out.println("*********************Even+:" + num);
-//                    list.pop();
-//                }
-                list.notifyAll();
+            }
+            fw.flush();
+        }catch (Exception e){
+
+        }finally {
+            try {
+                if(fw != null) {
+                    fw.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+
     }
 
     // 消费产品
     public void consumeOdd() {
-        while (!(count >= n && isAllnotOdd())) {
-            synchronized (list) {
-                //如果仓库存储量不足
-                while (list.size() == 0) {
-                    System.out.println("仓库已空，【consumerOdd】： 暂时不能执行消费任务!");
-                    try {
-                        // 由于条件不满足，消费阻塞
-                        list.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter("odd-numbers.txt");
+            while (!(count.intValue() >= n && isAllnotOdd())) {
+                synchronized (list) {
+                    //如果仓库存储量不足
+                    while (list.size() == 0) {
+                        System.out.println("仓库已空，【consumerOdd】： 暂时不能执行消费任务!");
+                        try {
+                            // 由于条件不满足，消费阻塞
+                            list.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
 
-                for (int i=0; i<list.size(); i++){
-                    if(list.get(i)%2==1){
-                        System.out.println("【consumerOdd】：消费了一个产品\t【现仓储量为】:" + list.size());
-                        System.out.println("*********************Odd+:" + list.get(i));
-                        list.remove(i);
+                    for (int i = 0; i < list.size(); i++) {
+                        if (list.get(i) % 2 == 1) {
+                            System.out.println("【consumerOdd】：消费了一个产品\t【现仓储量为】:" + list.size());
+                            System.out.println("*********************Odd+:" + list.get(i));
+                            fw.write(list.get(i).toString()+"\n");
+                            list.remove(i);
+                        }
                     }
+                    list.notifyAll();
                 }
-//                int num = list.peek();
-//            if (num % 2 == 1 || true) {
-//                System.out.println("*********************Odd+:" + num);
-//                list.pop();
-//            }
-                list.notifyAll();
+            }
+            fw.flush();
+        }catch (Exception e){
+
+        }finally {
+            try {
+                if(fw != null) {
+                    fw.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
     // 消费产品
     public void consumeNum(int methodNum) {
-        synchronized (list) {
-            //如果仓库存储量不足
-            while (list.size() == 0) {
-                System.out.println("仓库已空，【consumeNum】"+methodNum+"： 暂时不能执行消费任务!");
-                try {
-                    // 由于条件不满足，消费阻塞
-                    list.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter("div"+methodNum+"-numbers.txt");
+            while (!(count.intValue() >= n && isAllnotNumberDiv(methodNum))) {
 
-            for (int i=0; i<list.size(); i++){
-                if(list.get(i)%methodNum==0){
-                    System.out.println("【consumeNum】"+methodNum+"：消费了一个产品\t【现仓储量为】:" + list.size());
-                    System.out.println("*********************"+methodNum +":"+ list.get(i));
-                    list.remove(i);
+                synchronized (list) {
+                    //如果仓库存储量不足
+                    while (list.size() == 0) {
+                        System.out.println("仓库已空，【consumeNum】" + methodNum + "： 暂时不能执行消费任务!");
+                        try {
+                            // 由于条件不满足，消费阻塞
+                            list.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    for (int i = 0; i < list.size(); i++) {
+                        if (list.get(i) % methodNum == 0) {
+                            System.out.println("【consumeNum】" + methodNum + "：消费了一个产品\t【现仓储量为】:" + list.size());
+                            System.out.println("*********************" + methodNum + ":" + list.get(i));
+                            fw.write(list.get(i).toString()+"\n");
+                            list.remove(i);
+                        }
+                    }
+                    list.notifyAll();
                 }
             }
-            list.notifyAll();
+            fw.flush();
+        }catch (Exception e){
+            try {
+                if(fw != null) {
+                    fw.close();
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 
