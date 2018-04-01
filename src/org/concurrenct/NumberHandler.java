@@ -1,5 +1,6 @@
 package org.concurrenct;
 
+import java.util.Random;
 import java.util.Stack;
 
 /**
@@ -14,13 +15,22 @@ public class NumberHandler implements Runnable{
 
     private Integer m;
 
+    private Integer n;
+
     @Override
     public void run() {
 
     }
 
     private void methodGenerateNum(){
-
+        int i = 0;
+        Random random = new Random();
+        while (i<=m){
+            while (stack.size() <n ){
+                stack.add(random.nextInt());
+                i++;
+            }
+        }
     }
 
     private void methodA(){
@@ -41,5 +51,9 @@ public class NumberHandler implements Runnable{
 
     public void setM(Integer m) {
         this.m = m;
+    }
+
+    public void setN(Integer n) {
+        this.n = n;
     }
 }
