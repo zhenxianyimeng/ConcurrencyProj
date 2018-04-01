@@ -122,7 +122,7 @@ public class Storage {
         synchronized (list) {
             //如果仓库存储量不足
             while (list.size() == 0) {
-                System.out.println("仓库已空，【consumeNum】： 暂时不能执行消费任务!");
+                System.out.println("仓库已空，【consumeNum】"+methodNum+"： 暂时不能执行消费任务!");
                 try {
                     // 由于条件不满足，消费阻塞
                     list.wait();
@@ -133,8 +133,8 @@ public class Storage {
 
             for (int i=0; i<list.size(); i++){
                 if(list.get(i)%methodNum==0){
-                    System.out.println("【consumerOdd】：消费了一个产品\t【现仓储量为】:" + list.size());
-                    System.out.println("*********************Odd+:" + list.get(i));
+                    System.out.println("【consumeNum】"+methodNum+"：消费了一个产品\t【现仓储量为】:" + list.size());
+                    System.out.println("*********************"+methodNum +":"+ list.get(i));
                     list.remove(i);
                 }
             }
